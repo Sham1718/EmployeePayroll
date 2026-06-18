@@ -74,13 +74,15 @@ public class Main {
                     service.deleteEmployee(id);
                     break;
                 case 5:
-                    //salary
+                    System.out.println("Enter employee id:");
+                    empId= sc.nextInt();
+                    service.employeeSalary(empId);
                     break;
                 case 6:
-                    //dept
+                    service.deptWise();
                     break;
                 case 7:
-                    //top3
+                    service.topSalary();
                     break;
                 case 8:
                     System.exit(0);

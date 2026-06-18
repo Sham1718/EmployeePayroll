@@ -9,7 +9,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class PayRollService {
     public PreparedStatement getConnection(String sql) throws SQLException {
@@ -69,7 +72,7 @@ public class PayRollService {
     }
 
     public void updateEmployee(int id ,double salary,double bonus){
-        String sql ="Update Employee set salary=?,set bonus=? where id=?";
+        String sql ="Update Employee set salary=?,bonus=? where emp_id=?";
         try {
             PreparedStatement ps= getConnection(sql);
             ps.setDouble(1,salary);
@@ -83,17 +86,78 @@ public class PayRollService {
 
     }
 
-    public void EmployeeSalary(){
+    public void employeeSalary(int id) {
 
+        for (Employee emp : getEmployee()) {
 
+            if (emp.getEmpId() == id) {
+
+                double total =
+                        emp.getSalary()
+                                + emp.getBonus();
+
+                System.out.println("------------------------------------------------------");
+                System.out.println(
+                        " | Employee Name : "+ emp.getEmpName() + " | " +
+                        "Total Salary : " + total + " |"
+                );
+                System.out.println("------------------------------------------------------");
+
+                return;
+            }
+        }
+
+        System.out.println(
+                "Employee not found"
+        );
     }
 
-    public void TopSalary(){
+    public void topSalary() {
 
+        getEmployee()
+                .stream()
+                .sorted(
+                        Comparator
+                                .comparing(
+                                        Employee::getSalary
+                                )
+                                .reversed()
+                )
+                .limit(3)
+                .forEach(employee -> System.out.println( "| Employee Name : "+employee.getEmpName() + " | Salary : "
+                + employee.getSalary()+ " |"));
     }
 
-    public void DeptWise(){
+    public void deptWise() {
+        Map<Integer, String> departments =
+                Map.of(
+                        1, "IT",
+                        2, "HR",
+                        3, "Finance",
+                        4, "Sales"
+                );
 
+        getEmployee()
+                .stream()
+                .collect(
+                        Collectors.groupingBy(
+                                Employee::getDept_id
+                        )
+                )
+                .forEach(
+                        (deptId,
+                         employees) -> {
+
+                            System.out.println(
+                                    "Department : "
+                                            + departments.get(deptId)
+                            );
+                            System.out.println("---------------------------------------------------");
+                            employees.forEach(emp-> System.out.println("| Employee Name :"+emp.getEmpName() +
+                                    " | Email " + emp.getEmail() + " |"));
+                            System.out.println("---------------------------------------------------");
+                        }
+                );
     }
 
 }
